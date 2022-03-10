@@ -43,6 +43,7 @@ import 'package:glitcheffect/glitcheffect.dart';
 <table>
 <tr>
 <td>
+  
 ## Example
 
 ```dart
