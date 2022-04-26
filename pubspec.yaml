@@ -1,6 +1,6 @@
 name: glitcheffect
 description: A Flutter widget that will give a Glitch Animation Effect to it's child widget.
-version: 1.0.0
+version: 1.1.0
 homepage: https://github.com/sameersingh2704/glitcheffect
 
 environment:
