@@ -3,25 +3,25 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-class GlithEffect extends StatefulWidget {
+class GlitchEffect extends StatefulWidget {
+  const GlitchEffect({
+    Key? key,
+    required this.child,
+    this.duration,
+    this.colors,
+    this.onlyFirstTime = false,
+  }) : super(key: key);
+
   final Widget child;
   final bool onlyFirstTime;
   final Duration? duration;
   final List<Color>? colors;
 
-  const GlithEffect(
-      {Key? key,
-      required this.child,
-      this.duration,
-      this.colors,
-      this.onlyFirstTime = false})
-      : super(key: key);
-
   @override
-  _GlithEffectState createState() => _GlithEffectState();
+  _GlitchEffectState createState() => _GlitchEffectState();
 }
 
-class _GlithEffectState extends State<GlithEffect>
+class _GlitchEffectState extends State<GlitchEffect>
     with SingleTickerProviderStateMixin {
   late GlitchController _controller;
   late Timer _timer;
@@ -74,9 +74,7 @@ class _GlithEffectState extends State<GlithEffect>
         ];
   }
 
-  Color get _randomColor {
-    return _colors[math.Random().nextInt(_colors.length)];
-  }
+  Color get _randomColor => _colors[math.Random().nextInt(_colors.length)];
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +87,7 @@ class _GlithEffectState extends State<GlithEffect>
         }
         return Stack(
           children: [
-            if (random.nextBool()) _clipedChild,
+            if (random.nextBool()) _clippedChild,
             Transform.translate(
               offset: randomOffset,
               child: ShaderMask(
@@ -102,7 +100,7 @@ class _GlithEffectState extends State<GlithEffect>
                   ).createShader(bounds);
                 },
                 blendMode: BlendMode.srcATop,
-                child: _clipedChild,
+                child: _clippedChild,
               ),
             ),
           ],
@@ -116,7 +114,7 @@ class _GlithEffectState extends State<GlithEffect>
         (random.nextInt(10) - 5).toDouble(),
       );
 
-  Widget get _clipedChild => ClipPath(
+  Widget get _clippedChild => ClipPath(
         clipper: GlitchClipper(),
         child: widget.child,
       );
@@ -167,10 +165,11 @@ class GlitchController extends Animation<int>
   GlitchController({required this.duration});
 
   late Duration duration;
+
   List<Timer> _timers = [];
   bool isAnimating = false;
 
-  forward() {
+  void forward() {
     isAnimating = true;
     final oneStep = (duration.inMicroseconds / 3).round();
     _status = AnimationStatus.forward;
@@ -198,19 +197,19 @@ class GlitchController extends Animation<int>
     ];
   }
 
-  setValue(value) {
+  void setValue(value) {
     _value = value;
     notifyListeners();
   }
 
-  reset() {
+  void reset() {
     _status = AnimationStatus.dismissed;
     _value = 0;
   }
 
   @override
   void dispose() {
-    for (var timer in _timers) {
+    for (final timer in _timers) {
       timer.cancel();
     }
     super.dispose();
