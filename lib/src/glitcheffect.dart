@@ -8,6 +8,7 @@ class GlithEffect extends StatefulWidget {
   final bool onlyFirstTime;
   final Duration? duration;
   final List<Color>? colors;
+
   const GlithEffect(
       {Key? key,
       required this.child,
@@ -64,57 +65,64 @@ class _GlithEffectState extends State<GlithEffect>
     _controller.dispose();
   }
 
-  getRandomColor() =>
-      widget.colors ??
-      [
-        Colors.white,
-        Colors.grey,
-        Colors.black,
-      ][math.Random().nextInt(3)];
+  List<Color> get _colors {
+    return widget.colors ??
+        [
+          Colors.white,
+          Colors.grey,
+          Colors.black,
+        ];
+  }
+
+  Color get _randomColor {
+    return _colors[math.Random().nextInt(_colors.length)];
+  }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-        animation: _controller,
-        builder: (_, __) {
-          var color = getRandomColor().withOpacity(0.5);
-          if (!_controller.isAnimating) {
-            return widget.child;
-          }
-          return Stack(
-            children: [
-              if (random.nextBool()) _clipedChild,
-              Transform.translate(
-                offset: randomOffset,
-                child: ShaderMask(
-                  shaderCallback: (Rect bounds) {
-                    return LinearGradient(
-                      colors: <Color>[
-                        color,
-                        color,
-                      ],
-                    ).createShader(bounds);
-                  },
-                  blendMode: BlendMode.srcATop,
-                  child: _clipedChild,
-                ),
+      animation: _controller,
+      builder: (_, __) {
+        final color = _randomColor.withOpacity(0.5);
+        if (!_controller.isAnimating) {
+          return widget.child;
+        }
+        return Stack(
+          children: [
+            if (random.nextBool()) _clipedChild,
+            Transform.translate(
+              offset: randomOffset,
+              child: ShaderMask(
+                shaderCallback: (Rect bounds) {
+                  return LinearGradient(
+                    colors: <Color>[
+                      color,
+                      color,
+                    ],
+                  ).createShader(bounds);
+                },
+                blendMode: BlendMode.srcATop,
+                child: _clipedChild,
               ),
-            ],
-          );
-        });
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Offset get randomOffset => Offset(
         (random.nextInt(10) - 5).toDouble(),
         (random.nextInt(10) - 5).toDouble(),
       );
+
   Widget get _clipedChild => ClipPath(
         clipper: GlitchClipper(),
         child: widget.child,
       );
 }
 
-var random = math.Random();
+final random = math.Random();
 
 class GlitchClipper extends CustomClipper<Path> {
   final deltaMax = 15;
@@ -122,14 +130,14 @@ class GlitchClipper extends CustomClipper<Path> {
 
   @override
   getClip(Size size) {
-    var path = Path();
-    var y = randomStep;
+    final path = Path();
+    double y = randomStep;
     while (y < size.height) {
-      var yRandom = randomStep;
-      var x = randomStep;
+      final yRandom = randomStep;
+      double x = randomStep;
 
       while (x < size.width) {
-        var xRandom = randomStep;
+        final xRandom = randomStep;
         path.addRect(
           Rect.fromPoints(
             Offset(x, y.toDouble()),
@@ -164,7 +172,7 @@ class GlitchController extends Animation<int>
 
   forward() {
     isAnimating = true;
-    var oneStep = (duration.inMicroseconds / 3).round();
+    final oneStep = (duration.inMicroseconds / 3).round();
     _status = AnimationStatus.forward;
     _timers = [
       Timer(
