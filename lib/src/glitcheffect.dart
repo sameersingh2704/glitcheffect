@@ -17,7 +17,7 @@ class GlitchEffect extends StatefulWidget {
 
   /// Whether the glitch effect should repeat over and over or only play once.
   ///
-  /// The default value is false.
+  /// The default value is true.
   final bool repeat;
 
   /// How long it should take until the glitch effect repeats itself. If
