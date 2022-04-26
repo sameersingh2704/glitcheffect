@@ -9,12 +9,28 @@ class GlitchEffect extends StatefulWidget {
     required this.child,
     this.duration,
     this.colors,
-    this.onlyFirstTime = false,
+    this.repeat = true,
   }) : super(key: key);
 
+  /// The child Widget on which you want a glitch effect
   final Widget child;
-  final bool onlyFirstTime;
+
+  /// Whether the glitch effect should repeat over and over or only play once.
+  ///
+  /// The default value is false.
+  final bool repeat;
+
+  /// How long it should take until the glitch effect repeats itself. If
+  /// [repeat] is false, this will only have effect once.
+  ///
+  /// The default value is 3 seconds.
   final Duration? duration;
+
+  /// Colors you want to use for the glitch effect.
+  ///
+  /// A random color is used everytime the effects takes place
+  ///
+  /// If no colors are provided [default colors are Black, Grey and White].
   final List<Color>? colors;
 
   @override
@@ -24,37 +40,35 @@ class GlitchEffect extends StatefulWidget {
 class _GlitchEffectState extends State<GlitchEffect>
     with SingleTickerProviderStateMixin {
   late GlitchController _controller;
+
+  static const Duration _defaultDuration = Duration(seconds: 3);
+
+  /// Periodic timer of how often the glitch effect resets and starts over based
+  /// on [widget.duration].
+  ///
+  /// If [widget.duration] is null, the [_defaultDuration] is used.
   late Timer _timer;
-  bool showFirstEffect = false;
 
   @override
   void initState() {
-    showFirstEffect = widget.onlyFirstTime;
     _controller = GlitchController(
       duration: const Duration(
         milliseconds: 400,
       ),
     );
 
-    /// Duration after which the glitch effect will be reset
-    _timer = widget.onlyFirstTime
-        ? Timer.periodic(widget.duration ?? const Duration(seconds: 3),
-            (timer) {
-            if (showFirstEffect) {
-              _controller
-                ..reset()
-                ..forward();
-            }
-            showFirstEffect = false;
+    _timer = widget.repeat
+        ? Timer.periodic(widget.duration ?? _defaultDuration, (_) {
+            _controller
+              ..reset()
+              ..forward();
           })
-        : Timer.periodic(
-            widget.duration ?? const Duration(seconds: 3),
-            (_) {
-              _controller
-                ..reset()
-                ..forward();
-            },
-          );
+        : Timer.periodic(widget.duration ?? _defaultDuration, (_) {
+            _controller
+              ..reset()
+              ..forward();
+            _timer.cancel();
+          });
     super.initState();
   }
 
