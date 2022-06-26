@@ -1,3 +1,11 @@
-## 0.0.1
+## 1.1.0
+* Support colors from outside
 
-* TODO: Describe initial release.
+## 1.0.2 
+* Imporved Documentation
+
+## 1.0.1 
+* Updated Readme file
+
+## 1.0.0 
+* Provides glitch effect to child widget.

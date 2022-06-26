@@ -36,7 +36,7 @@ import 'package:glitcheffect/glitcheffect.dart';
 * *colors* : List of colors that you want to use for glitch effect. *[default colors are Black, Grey and White]*.
 
 ### Preview
-![alt-text](assets/gif/glitch.gif)
+![alt-text](https://raw.githubusercontent.com/sameersingh2704/glitcheffect/main/assets/gif/glitch.gif)
 
 <hr>
 
@@ -64,6 +64,6 @@ class GlitchEffectExample extends StatelessWidget {
 ```
 
 
-
 ## Contributors
 * [**Sameer Singh**](https://github.com/sameersingh2704)
+* [**Juliotati**](https://github.com/Juliotati)
