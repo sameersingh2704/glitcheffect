@@ -3,57 +3,72 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-class GlithEffect extends StatefulWidget {
+class GlitchEffect extends StatefulWidget {
+  const GlitchEffect({
+    Key? key,
+    required this.child,
+    this.duration,
+    this.colors,
+    this.repeat = true,
+  }) : super(key: key);
+
+  /// The child Widget on which you want a glitch effect
   final Widget child;
-  final bool onlyFirstTime;
+
+  /// Whether the glitch effect should repeat over and over or only play once.
+  ///
+  /// The default value is true.
+  final bool repeat;
+
+  /// How long it should take until the glitch effect repeats itself. If
+  /// [repeat] is false, this will only have effect once.
+  ///
+  /// The default value is 3 seconds.
   final Duration? duration;
+
+  /// Colors you want to use for the glitch effect.
+  ///
+  /// A random color is used everytime the effects takes place
+  ///
+  /// If no colors are provided [default colors are Black, Grey and White].
   final List<Color>? colors;
-  const GlithEffect(
-      {Key? key,
-      required this.child,
-      this.duration,
-      this.colors,
-      this.onlyFirstTime = false})
-      : super(key: key);
 
   @override
-  _GlithEffectState createState() => _GlithEffectState();
+  _GlitchEffectState createState() => _GlitchEffectState();
 }
 
-class _GlithEffectState extends State<GlithEffect>
+class _GlitchEffectState extends State<GlitchEffect>
     with SingleTickerProviderStateMixin {
   late GlitchController _controller;
+
+  static const Duration _defaultDuration = Duration(seconds: 3);
+
+  /// Periodic timer of how often the glitch effect resets and starts over based
+  /// on [widget.duration].
+  ///
+  /// If [widget.duration] is null, the [_defaultDuration] is used.
   late Timer _timer;
-  bool showFirstEffect = false;
 
   @override
   void initState() {
-    showFirstEffect = widget.onlyFirstTime;
     _controller = GlitchController(
       duration: const Duration(
         milliseconds: 400,
       ),
     );
 
-    /// Duration after which the glitch effect will be reset
-    _timer = widget.onlyFirstTime
-        ? Timer.periodic(widget.duration ?? const Duration(seconds: 3),
-            (timer) {
-            if (showFirstEffect) {
-              _controller
-                ..reset()
-                ..forward();
-            }
-            showFirstEffect = false;
+    _timer = widget.repeat
+        ? Timer.periodic(widget.duration ?? _defaultDuration, (_) {
+            _controller
+              ..reset()
+              ..forward();
           })
-        : Timer.periodic(
-            widget.duration ?? const Duration(seconds: 3),
-            (_) {
-              _controller
-                ..reset()
-                ..forward();
-            },
-          );
+        : Timer.periodic(widget.duration ?? _defaultDuration, (_) {
+            _controller
+              ..reset()
+              ..forward();
+            _timer.cancel();
+          });
     super.initState();
   }
 
@@ -64,57 +79,62 @@ class _GlithEffectState extends State<GlithEffect>
     _controller.dispose();
   }
 
-  getRandomColor() =>
-      widget.colors ??
-      [
-        Colors.white,
-        Colors.grey,
-        Colors.black,
-      ][math.Random().nextInt(3)];
+  List<Color> get _colors {
+    return widget.colors ??
+        [
+          Colors.white,
+          Colors.grey,
+          Colors.black,
+        ];
+  }
+
+  Color get _randomColor => _colors[math.Random().nextInt(_colors.length)];
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-        animation: _controller,
-        builder: (_, __) {
-          var color = getRandomColor().withOpacity(0.5);
-          if (!_controller.isAnimating) {
-            return widget.child;
-          }
-          return Stack(
-            children: [
-              if (random.nextBool()) _clipedChild,
-              Transform.translate(
-                offset: randomOffset,
-                child: ShaderMask(
-                  shaderCallback: (Rect bounds) {
-                    return LinearGradient(
-                      colors: <Color>[
-                        color,
-                        color,
-                      ],
-                    ).createShader(bounds);
-                  },
-                  blendMode: BlendMode.srcATop,
-                  child: _clipedChild,
-                ),
+      animation: _controller,
+      builder: (_, __) {
+        final color = _randomColor.withOpacity(0.5);
+        if (!_controller.isAnimating) {
+          return widget.child;
+        }
+        return Stack(
+          children: [
+            if (random.nextBool()) _clippedChild,
+            Transform.translate(
+              offset: randomOffset,
+              child: ShaderMask(
+                shaderCallback: (Rect bounds) {
+                  return LinearGradient(
+                    colors: <Color>[
+                      color,
+                      color,
+                    ],
+                  ).createShader(bounds);
+                },
+                blendMode: BlendMode.srcATop,
+                child: _clippedChild,
               ),
-            ],
-          );
-        });
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Offset get randomOffset => Offset(
         (random.nextInt(10) - 5).toDouble(),
         (random.nextInt(10) - 5).toDouble(),
       );
-  Widget get _clipedChild => ClipPath(
+
+  Widget get _clippedChild => ClipPath(
         clipper: GlitchClipper(),
         child: widget.child,
       );
 }
 
-var random = math.Random();
+final random = math.Random();
 
 class GlitchClipper extends CustomClipper<Path> {
   final deltaMax = 15;
@@ -122,14 +142,14 @@ class GlitchClipper extends CustomClipper<Path> {
 
   @override
   getClip(Size size) {
-    var path = Path();
-    var y = randomStep;
+    final path = Path();
+    double y = randomStep;
     while (y < size.height) {
-      var yRandom = randomStep;
-      var x = randomStep;
+      final yRandom = randomStep;
+      double x = randomStep;
 
       while (x < size.width) {
-        var xRandom = randomStep;
+        final xRandom = randomStep;
         path.addRect(
           Rect.fromPoints(
             Offset(x, y.toDouble()),
@@ -159,12 +179,13 @@ class GlitchController extends Animation<int>
   GlitchController({required this.duration});
 
   late Duration duration;
+
   List<Timer> _timers = [];
   bool isAnimating = false;
 
-  forward() {
+  void forward() {
     isAnimating = true;
-    var oneStep = (duration.inMicroseconds / 3).round();
+    final oneStep = (duration.inMicroseconds / 3).round();
     _status = AnimationStatus.forward;
     _timers = [
       Timer(
@@ -190,19 +211,19 @@ class GlitchController extends Animation<int>
     ];
   }
 
-  setValue(value) {
+  void setValue(value) {
     _value = value;
     notifyListeners();
   }
 
-  reset() {
+  void reset() {
     _status = AnimationStatus.dismissed;
     _value = 0;
   }
 
   @override
   void dispose() {
-    for (var timer in _timers) {
+    for (final timer in _timers) {
       timer.cancel();
     }
     super.dispose();

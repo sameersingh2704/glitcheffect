@@ -20,7 +20,7 @@ A Flutter widget that will give a Glitch Animation Effect to it's child widget.
 1. Add the latest version of package to your pubspec.yaml (and run`dart pub get`):
 ```yaml
 dependencies:
-  glitcheffect: ^1.0.2
+  glitcheffect: ^1.1.0
 ```
 2. Import the package and use it in your Flutter App.
 ```dart
@@ -30,10 +30,10 @@ import 'package:glitcheffect/glitcheffect.dart';
 
 3. There are a number of properties that you can modify:
 
-* *child* : Widget on which you want glitch effect.
-* *onlyFirstTime* : if you want this animation once *[default value is false]*.
-* *duration* : Duration after which you want the animation to repeat itself *[default value is 3 seconds]*.
-* *colors* : List of colors that you want to use for glitch effect *[default colors are Black, Grey and White]*.
+* *child* : Widget on which you want a glitch effect.
+* *repeat* : Whether the glitch effect should play once or play over and over. *[default value is true]*.
+* *duration* : How long it should take until the glitch effect repeats itself *[default value is 3 seconds]*.
+* *colors* : List of colors that you want to use for glitch effect. *[default colors are Black, Grey and White]*.
 
 ### Preview
 ![alt-text](assets/gif/glitch.gif)
@@ -53,11 +53,11 @@ class GlitchEffectExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlithEffect(
-                child: Text(
-                  'Flutter',
-                  style: TextStyle(fontSize: 30, color: Colors.red),
-                ),
-              );
+      child: Text(
+        'Flutter',
+        style: TextStyle(fontSize: 30, color: Colors.red),
+      ),
+    );
   }
 }
 
