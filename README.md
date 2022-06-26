@@ -20,7 +20,7 @@ A Flutter widget that will give a Glitch Animation Effect to it's child widget.
 1. Add the latest version of package to your pubspec.yaml (and run`dart pub get`):
 ```yaml
 dependencies:
-  glitcheffect: ^1.1.0
+  glitcheffect: ^1.1.1
 ```
 2. Import the package and use it in your Flutter App.
 ```dart
