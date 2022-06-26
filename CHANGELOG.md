@@ -1,4 +1,4 @@
-## 1.1.0
+## 1.1.1
 * Support colors from outside
 
 ## 1.0.2 
