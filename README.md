@@ -52,7 +52,7 @@ class GlitchEffectExample extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlithEffect(
+    return GlitchEffect(
       child: Text(
         'Flutter',
         style: TextStyle(fontSize: 30, color: Colors.red),
