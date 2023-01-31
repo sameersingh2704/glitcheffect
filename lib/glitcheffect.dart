@@ -1,3 +1,4 @@
 library glitcheffect;
 
-export 'src/glitcheffect.dart';
+export 'src/glitch_effect.dart';
+export 'src/glitch_controller.dart';
