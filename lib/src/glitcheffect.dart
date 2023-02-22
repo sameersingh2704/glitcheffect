@@ -211,7 +211,7 @@ class GlitchController extends Animation<int>
     ];
   }
 
-  void setValue(value) {
+  void setValue(int value) {
     _value = value;
     notifyListeners();
   }
